@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Your Loans') }}
+            {{ __('Your Past Loans') }}
         </h2>
     </x-slot>
 
@@ -9,7 +9,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <form method="GET" action="{{ route('dashboard') }}" class="flex items-center  mb-5">
+                    <form method="GET" action="{{ route('pastLoans') }}" class="flex items-center  mb-5">
                         <x-text-input name="search" placeholder="Search loans here..." class="mr-3" />
                         <x-primary-button>Search</x-primary-button>
                     </form>
@@ -21,13 +21,12 @@
                         @endif
                         <div class="flex">
                             <img src="{{ $loan->book->image }}" class="mr-2" />
-                            <h1 class="mr-2">{{ $loan->book->title }}</h1>
-                            <p>Due in {{ $loan->date_difference }} days</p>
+                            <a href="" class="mr-2">{{ $loan->book->title }}</a>
+                            <p class="mr-2">Borrowed: {{ $loan->borrow_date }}</p>
+                            <p class="mr-2">Due Date: {{ $loan->due_date }}</p>
+                            <p>Returned: {{ $loan->return_date }}</p>
                         </div>
-                        <form method="POST" action="{{ route('removeLoan', $loan->id) }}">
-                            @csrf
-                            <x-primary-button>Return book</x-primary-button>
-                        </form>
+                        <p>Returned Succuessfully</p>
                 </div>
             @empty
                 <p>No loans found.</p>

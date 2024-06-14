@@ -18,11 +18,9 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [LoanController::class, 'view'])->name('dashboard');
+    Route::get('/pastLoans', [LoanController::class, 'pastLoans'])->name('pastLoans');
+    Route::post('/removeLoan/{id}', [LoanController::class, 'removeLoan'])->name('removeLoan');
 });
-
-// Route::get('/loans', function () {
-//     return view('loans');
-// })->middleware(['auth', 'verified'])->name('loans');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
