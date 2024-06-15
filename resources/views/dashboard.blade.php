@@ -10,7 +10,8 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     <form method="GET" action="{{ route('dashboard') }}" class="flex items-center  mb-5">
-                        <x-text-input name="search" placeholder="Search loans here..." class="mr-3" />
+                        <x-text-input name="search" placeholder="Search loans here..." class="mr-3"
+                            value="{{ $search }}" />
                         <x-primary-button>Search</x-primary-button>
                     </form>
                     @forelse($loans as $key=>$loan)

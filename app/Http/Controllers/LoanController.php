@@ -31,7 +31,7 @@ class LoanController extends Controller
             $loan->date_difference = $difference;
         }
         
-        return view('dashboard', ['loans' => $loans]);
+        return view('dashboard', ['loans' => $loans], ['search' => $search]);
     }
 
     public function pastLoans(Request $request) {
@@ -47,7 +47,7 @@ class LoanController extends Controller
             $loans = Loan::where('user_id', $id)->where('status', 'returned')->with('book')->get();
         }
         
-        return view('past-loans', ['loans' => $loans]);
+        return view('past-loans', ['loans' => $loans], ['search' => $search]);
     }
 
     public function createLoan($id) {
@@ -73,9 +73,8 @@ class LoanController extends Controller
     public function viewAll(Request $request) {
         //admin: view and search all loans
         $id = Auth::id();
-        $user = User::find($id);
 
-        if($user->admin == 1) {
+        if(Auth::user()->admin == true) {
             $search = $request->input('search');
             $loans = [];
 
@@ -84,7 +83,7 @@ class LoanController extends Controller
                     $query->where('title', 'like', "%$search%");
                 })->with('book')->with('user')->get();
             } else {
-                $loans = Loan::all()->with('book')->with('user')->get();
+                $loans = Loan::all();
             }
 
             foreach($loans as $loan) {
@@ -99,17 +98,30 @@ class LoanController extends Controller
                 }
             }
             
-            return view('dashboard', ['loans' => $loans]);
+            return view('admin-loans', ['loans' => $loans], ['search' => $search]);
         } else {
-            return view('error', ['message' => "Admin only"]);
+            return view('error', ['message' => "This page is for admins only."]);
+        }
+    }
+
+    public function editLoan($id) {
+        $loan = Loan::find($id);
+        if(Auth::user()->admin != true) {
+            return view('error', ['message' => "This page is for admins only."]);
+        } else {
+            return view('edit-loan', ['loan' => $loan]);
         }
     }
     
-    public function editLoan(Request $request, $id) {
-        //admin: can only edit due date and status
+    public function updateLoan(Request $request, $id) {
+        //admin: can only edit due date, return date, and status
+        Log::info($request);
         $loan = Loan::find($id);
         $loan->due_date = $request->due_date;
+        $loan->return_date = $request->return_date;
         $loan->status = $request->status;
+        $loan->save();
+        return redirect('/viewAll');
     }
 
     public function deleteLoan($id) {

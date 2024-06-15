@@ -19,7 +19,10 @@ Route::get('/', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [LoanController::class, 'view'])->name('dashboard');
     Route::get('/pastLoans', [LoanController::class, 'pastLoans'])->name('pastLoans');
-    Route::post('/removeLoan/{id}', [LoanController::class, 'removeLoan'])->name('removeLoan');
+    Route::get('/viewAll', [LoanController::class, 'viewAll'])->name('viewAll');
+    Route::get('/editLoan/{id}', [LoanController::class, 'editLoan'])->name('editLoan');
+    Route::put('/updateLoan/{id}', [LoanController::class, 'updateLoan'])->name('updateLoan');
+    Route::delete('/removeLoan/{id}', [LoanController::class, 'removeLoan'])->name('removeLoan');
 });
 
 Route::middleware('auth')->group(function () {
