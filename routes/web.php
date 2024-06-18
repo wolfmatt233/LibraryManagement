@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BookController;
 use App\Http\Controllers\LoanController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -17,12 +18,26 @@ Route::get('/', function () {
 //wishlist
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', [LoanController::class, 'view'])->name('dashboard');
+    //user: loans
+    Route::get('/dashboard', [LoanController::class, 'index'])->name('dashboard');
     Route::get('/pastLoans', [LoanController::class, 'pastLoans'])->name('pastLoans');
+    Route::get('/createLoan', [LoanController::class, 'createLoan'])->name('createLoan');
+    Route::post('/removeLoan/{id}', [LoanController::class, 'removeLoan'])->name('removeLoan');
+
+    //user: books
+    Route::get('/books', [BookController::class, 'index'])->name('index');
+    Route::get('/books/{id}', [BookController::class, 'getBook'])->name('getBook');
+    Route::post('/addWishlist/{id}', [BookController::class, 'addWishlist'])->name('addWishlist');
+
+    //admin: loans
     Route::get('/viewAll', [LoanController::class, 'viewAll'])->name('viewAll');
     Route::get('/editLoan/{id}', [LoanController::class, 'editLoan'])->name('editLoan');
     Route::put('/updateLoan/{id}', [LoanController::class, 'updateLoan'])->name('updateLoan');
-    Route::delete('/removeLoan/{id}', [LoanController::class, 'removeLoan'])->name('removeLoan');
+    Route::delete('/deleteLoan/{id}', [LoanController::class, 'deleteLoan'])->name('deleteLoan');
+
+    //admin: books
+    Route::get('/addBook', [BookController::class, 'addBook'])->name('addBook');
+    Route::post('/createBook', [BookController::class, 'createBook'])->name('createBook');
 });
 
 Route::middleware('auth')->group(function () {
@@ -31,4 +46,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

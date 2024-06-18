@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Log;
 
 class LoanController extends Controller
 {
-    public function view(Request $request) {
+    public function index(Request $request) {
         $id = Auth::id();
         $search = $request->input('search');
         $loans = [];
@@ -72,8 +72,6 @@ class LoanController extends Controller
 
     public function viewAll(Request $request) {
         //admin: view and search all loans
-        $id = Auth::id();
-
         if(Auth::user()->admin == true) {
             $search = $request->input('search');
             $loans = [];
@@ -107,7 +105,7 @@ class LoanController extends Controller
     public function editLoan($id) {
         $loan = Loan::find($id);
         if(Auth::user()->admin != true) {
-            return view('error', ['message' => "This page is for admins only."]);
+            return view('error', ['message' => "Access denied: This page is for admins only."]);
         } else {
             return view('edit-loan', ['loan' => $loan]);
         }
@@ -115,19 +113,27 @@ class LoanController extends Controller
     
     public function updateLoan(Request $request, $id) {
         //admin: can only edit due date, return date, and status
-        Log::info($request);
-        $loan = Loan::find($id);
-        $loan->due_date = $request->due_date;
-        $loan->return_date = $request->return_date;
-        $loan->status = $request->status;
-        $loan->save();
-        return redirect('/viewAll');
+        if(Auth::user()->admin != true) {
+            return view('error', ['message' => "Access denied: This page is for admins only."]);
+        } else {
+            $loan = Loan::find($id);
+            $loan->due_date = $request->due_date;
+            $loan->return_date = $request->return_date;
+            $loan->status = $request->status;
+            $loan->save();
+            return redirect('/viewAll');
+        }
     }
 
     public function deleteLoan($id) {
         //admin
-        $loan = Loan::find($id);
-        $loan->delete();
-        return redirect('/adminLoans');
+        if(Auth::user()->admin != true) {
+            return view('error', ['message' => "Access denied: This page is for admins only."]);
+        } else {
+            $loan = Loan::find($id);
+            $loan->delete();
+            return redirect('/viewAll');
+        }
+        
     }
 }
