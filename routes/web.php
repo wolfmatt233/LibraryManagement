@@ -21,13 +21,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     //user: loans
     Route::get('/dashboard', [LoanController::class, 'index'])->name('dashboard');
     Route::get('/pastLoans', [LoanController::class, 'pastLoans'])->name('pastLoans');
-    Route::get('/createLoan', [LoanController::class, 'createLoan'])->name('createLoan');
+    Route::post('/createLoan/{id}', [LoanController::class, 'createLoan'])->name('createLoan');
     Route::post('/removeLoan/{id}', [LoanController::class, 'removeLoan'])->name('removeLoan');
 
     //user: books
-    Route::get('/books', [BookController::class, 'index'])->name('index');
+    Route::get('/books', [BookController::class, 'index'])->name('books');
     Route::get('/books/{id}', [BookController::class, 'getBook'])->name('getBook');
     Route::post('/addWishlist/{id}', [BookController::class, 'addWishlist'])->name('addWishlist');
+
+    //user: holds
+    //TO DO
+    Route::get('/holds', [BookController::class, 'index'])->name('holds');
+    Route::post('/createHold/{id}', [BookController::class, 'createHold'])->name('createHold');
 
     //admin: loans
     Route::get('/viewAll', [LoanController::class, 'viewAll'])->name('viewAll');

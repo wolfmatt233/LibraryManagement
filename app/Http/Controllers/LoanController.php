@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Book;
 use App\Models\Loan;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -51,22 +52,38 @@ class LoanController extends Controller
     }
 
     public function createLoan($id) {
-        $newLoan = new Loan();
-        $newLoan->book_id = $id;
-        $newLoan->user_id = Auth::id();
-        $newLoan->borrow_date = date("Y-m-d");
-        $newLoan->due_date = date('Y-m-d', strtotime("Y-m-d" . ' + 21 days'));
-        $newLoan->return_date = null;
-        $newLoan->status = "borrowed";
-        $newLoan->save();
-        return redirect('/books/{id}');
+        $book = Book::find($id);
+
+        if($book->num_available == 0) {
+            return redirect('/books/' . $id);
+        } else {
+            $newLoan = new Loan();
+            $newLoan->book_id = $id;
+            $newLoan->user_id = Auth::id();
+            $newLoan->borrow_date = date("Y-m-d");
+            $newLoan->due_date = date('Y-m-d', strtotime(date('Y-m-d') . ' + 21 days'));
+            $newLoan->return_date = null;
+            $newLoan->status = "borrowed";
+            $newLoan->save();
+            
+            $book->num_available -= 1;
+            $book->save();
+
+            return redirect('/books/' . $id);
+        }
     }
 
     public function removeLoan($id) {
+        $book = Book::find($id);
+
         $loan = Loan::find($id);
         $loan->status = "returned";
         $loan->return_date = date("Y-m-d");
         $loan->save();
+
+        $book->num_available += 1;
+        $book->save();
+
         return redirect('/dashboard');
     }
 
@@ -88,7 +105,7 @@ class LoanController extends Controller
                 $loan->user = $loan->user->name; //only get name to pass over
 
                 if($loan->status == "borrowed") {
-                    $today = strtotime(date("Y-m-d"));
+                    $today = strtotime(date("m/d/Y"));
                     $due = strtotime($loan->due_date);
                     $difference = $due - $today;
                     $difference = round($difference / (60 * 60 * 24));

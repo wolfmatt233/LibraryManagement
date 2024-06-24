@@ -8,15 +8,17 @@ This is a system that allows users to borrow books and return them before a cert
 
 ## To Do
 
--   Display and paginate books.
--   Display individual books.
-    -   Add books to wishlist
--   Search and filter books.
--   Create a loan (borrow a book)
--   Users place holds on backordered books.
--   Users can only take out 10 loans at a time.
+-   Add books to wishlist
+-   Filter and sort books
+-   Users place holds on backordered books
+    -   If no copies are available: 0
 -   Error handling
+    -   Users can only take out 10 loans at a time
+    -   Users cannot access admin pages and routes
 -   Admin features
+    -   Adding books
+    -   Updating books (including image upload)
+    -   Deleting books
 
 MySQL Database:
 
@@ -42,6 +44,7 @@ MySQL Database:
     -   Hold date (place in line)
 -   Users
     -   Handled by Laravel Breeze
+    -   Added admin
 -   Wishlist
     -   Book id
     -   User id

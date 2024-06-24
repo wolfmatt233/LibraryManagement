@@ -18,6 +18,9 @@
                     <x-nav-link :href="route('pastLoans')" :active="request()->routeIs('pastLoans')">
                         {{ __('Past Loans') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('books')" :active="request()->routeIs('books')">
+                        {{ __('Books') }}
+                    </x-nav-link>
                     @if (Auth::user()->admin == true)
                         <x-nav-link :href="route('viewAll')" :active="request()->routeIs('viewAll')">
                             {{ __('All Loans') }}

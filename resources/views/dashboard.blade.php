@@ -21,9 +21,20 @@
                                 <div class="bg-gray-100 p-3 flex justify-between items-center">
                         @endif
                         <div class="flex">
-                            <img src="{{ $loan->book->image }}" class="mr-2" />
-                            <h1 class="mr-2">{{ $loan->book->title }}</h1>
-                            <p>Due in {{ $loan->date_difference }} days</p>
+                            <a href="{{ route('getBook', $loan->id) }}">
+                                <img src="{{ URL('/images/' . $loan->book->image) }}" class="mr-2 w-14" />
+                            </a>
+                            <div>
+                                <a class="mr-2 underline" href="{{ route('getBook', $loan->id) }}">
+                                    {{ $loan->book->title }}
+                                </a>
+                                @if ($loan->date_difference < 0)
+                                    <p class="text-red-500">Loan overdue by {{ $loan->date_difference *= -1 }} days!</p>
+                                    <p class="text-red-500">Due date: {{ $loan->due_date }}</p>
+                                @else
+                                    <p>Due in {{ $loan->date_difference }} days</p>
+                                @endif
+                            </div>
                         </div>
                         <form method="POST" action="{{ route('removeLoan', $loan->id) }}">
                             @csrf
