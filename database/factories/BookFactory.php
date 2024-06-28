@@ -24,7 +24,7 @@ class BookFactory extends Factory
             "isbn" => "123-4-56-789012-3",
             "publisher" => "Tor Books",
             "published" => fake()->date(),
-            "image" => "img.png",
+            "image" => "img.jpg",
             "num_available" => 10
         ];
     }

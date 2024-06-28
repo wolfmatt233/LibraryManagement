@@ -28,26 +28,32 @@
                                 <p><b>Copies available:</b> {{ $book->num_available }}</p>
                             </div>
                             <div class="mt-3">
-                                @if ($borrowed != false)
+                                @if ($borrowed != 'false')
                                     <form method="POST" action="{{ route('removeLoan', $borrowed) }}">
                                         @csrf
                                         <x-primary-button>Return book</x-primary-button>
                                     </form>
                                 @else
-                                    @if ($book->num_available != 0)
-                                        <form method="POST" action="{{ route('createLoan', $book->id) }}">
-                                            @csrf
-                                            <x-primary-button>Borrow</x-primary-button>
-                                        </form>
-                                    @elseif($book->num_available == 0)
-                                        <form action="POST" action="{{ route('createHold', $book->id) }}">
-                                            @csrf
-                                            <p class="mb-2">No copies available. Try reserving the item.</p>
-                                            <x-primary-button>Place Hold</x-primary-button>
-                                        </form>
+                                    @if ($limited == 'true')
+                                        <p
+                                            class="border border-gray-300 rounded-md font-semibold text-sm text-gray-700 inline-flex p-1 shadow-sm">
+                                            Max Borrow Limit Reached
+                                        </p>
+                                    @else
+                                        @if ($book->num_available != 0)
+                                            <form method="POST" action="{{ route('createLoan', $book->id) }}">
+                                                @csrf
+                                                <x-primary-button>Borrow</x-primary-button>
+                                            </form>
+                                        @elseif($book->num_available == 0)
+                                            <form method="POST" action="{{ route('createHold', $book->id) }}">
+                                                @csrf
+                                                <p class="mb-2">No copies available. Try reserving the item.</p>
+                                                <x-primary-button>Place Hold</x-primary-button>
+                                            </form>
+                                        @endif
                                     @endif
                                 @endif
-
                             </div>
                         </div>
                     </div>

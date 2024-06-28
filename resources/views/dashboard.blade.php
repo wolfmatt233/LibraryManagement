@@ -9,10 +9,10 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <form method="GET" action="{{ route('dashboard') }}" class="flex items-center  mb-5">
-                        <x-text-input name="search" placeholder="Search loans here..." class="mr-3"
-                            value="{{ $search }}" />
-                        <x-primary-button>Search</x-primary-button>
+                    <form method="GET" action="{{ route('dashboard') }}" class="flex w-full mb-5 sm:flex-row flex-col">
+                        <x-text-input name="search" placeholder="Search loans here..." value="{{ $search }}"
+                            class="w-full mr-3 sm:mb-0 mb-2" />
+                        <x-primary-button class="sm:justify-normal justify-center">Search</x-primary-button>
                     </form>
                     @forelse($loans as $key=>$loan)
                         @if ($key % 2 != 0)
@@ -21,11 +21,12 @@
                                 <div class="bg-gray-100 p-3 flex justify-between items-center">
                         @endif
                         <div class="flex">
-                            <a href="{{ route('getBook', $loan->id) }}">
+                            <a href="{{ route('getBook', $loan->book_id) }}">
                                 <img src="{{ URL('/images/' . $loan->book->image) }}" class="mr-2 w-14" />
                             </a>
                             <div>
-                                <a class="mr-2 underline" href="{{ route('getBook', $loan->id) }}">
+
+                                <a class="mr-2 underline" href="{{ route('getBook', $loan->book_id) }}">
                                     {{ $loan->book->title }}
                                 </a>
                                 @if ($loan->date_difference < 0)

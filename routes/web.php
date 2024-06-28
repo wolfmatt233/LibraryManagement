@@ -1,21 +1,15 @@
 <?php
 
 use App\Http\Controllers\BookController;
+use App\Http\Controllers\HoldController;
 use App\Http\Controllers\LoanController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Middleware\CheckAdmin;
 
 Route::get('/', function () {
     return view('welcome');
 });
-
-// landing page -> no auth needed
-
-//need auth:
-//browse/search books
-//loans
-//profile
-//wishlist
 
 Route::middleware(['auth', 'verified'])->group(function () {
     //user: loans
@@ -30,10 +24,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/addWishlist/{id}', [BookController::class, 'addWishlist'])->name('addWishlist');
 
     //user: holds
-    //TO DO
-    Route::get('/holds', [BookController::class, 'index'])->name('holds');
-    Route::post('/createHold/{id}', [BookController::class, 'createHold'])->name('createHold');
+    Route::post('/createHold/{id}', [LoanController::class, 'createHold'])->name('createHold');
+});
 
+Route::middleware(CheckAdmin::class)->group(function() {
     //admin: loans
     Route::get('/viewAll', [LoanController::class, 'viewAll'])->name('viewAll');
     Route::get('/editLoan/{id}', [LoanController::class, 'editLoan'])->name('editLoan');
