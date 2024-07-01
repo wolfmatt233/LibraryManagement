@@ -5,57 +5,60 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use App\Models\Hold;
 use App\Models\Loan;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class LoanController extends Controller
 {
-    public function index(Request $request) {
-        $id = Auth::id();
+    public function index(Request $request)
+    {
+        $uid = Auth::id();
         $search = $request->input('search');
         $loans = [];
 
-        if($search) {
-            $loans = Loan::where('user_id', $id)->where('status', 'borrowed')->whereHas('book', function($query) use($search) {
+        if ($search) {
+            $loans = Loan::where('user_id', $uid)->where('status', 'borrowed')->whereHas('book', function ($query) use ($search) {
                 $query->where('title', 'like', "%$search%");
             })->with('book')->get();
         } else {
-            $loans = Loan::where('user_id', $id)->where('status', 'borrowed')->with('book')->get();
+            $loans = Loan::where('user_id', $uid)->where('status', 'borrowed')->with('book')->get();
         }
 
-        foreach($loans as $loan) {
+        foreach ($loans as $loan) {
             $today = strtotime(date("Y-m-d"));
             $due = strtotime($loan->due_date);
             $difference = $due - $today;
             $difference = round($difference / (60 * 60 * 24));
             $loan->date_difference = $difference;
         }
-        
-        return view('dashboard', ['loans' => $loans], ['search' => $search]);
+
+        return view('loans/loans', ['loans' => $loans, 'search' => $search]);
     }
 
-    public function pastLoans(Request $request) {
+    public function pastLoans(Request $request)
+    {
         $id = Auth::id();
         $search = $request->input('search');
         $loans = [];
 
-        if($search) {
-            $loans = Loan::where('user_id', $id)->where('status', 'returned')->whereHas('book', function($query) use($search) {
+        if ($search) {
+            $loans = Loan::where('user_id', $id)->where('status', 'returned')->whereHas('book', function ($query) use ($search) {
                 $query->where('title', 'like', "%$search%");
             })->with('book')->get();
         } else {
             $loans = Loan::where('user_id', $id)->where('status', 'returned')->with('book')->get();
         }
-        
-        return view('past-loans', ['loans' => $loans], ['search' => $search]);
+
+        return view('loans/past-loans', ['loans' => $loans], ['search' => $search]);
     }
 
-    public function createLoan($id) {
+    public function createLoan($id)
+    {
         $book = Book::find($id);
+        $loans = Loan::where('user_id', Auth::id())->where('status', 'borrowed')->get();
 
-        if($book->num_available == 0) {
+        if ($book->num_available == 0 || count($loans) >= 10) {
             return redirect('/books/' . $id);
         } else {
             $newLoan = new Loan();
@@ -66,7 +69,7 @@ class LoanController extends Controller
             $newLoan->return_date = null;
             $newLoan->status = "borrowed";
             $newLoan->save();
-            
+
             $book->num_available -= 1;
             $book->save();
 
@@ -74,7 +77,8 @@ class LoanController extends Controller
         }
     }
 
-    public function removeLoan($id) {
+    public function removeLoan($id)
+    {
         $loan = Loan::find($id);
         $book = Book::find($loan->book_id);
 
@@ -90,25 +94,33 @@ class LoanController extends Controller
         return redirect('/dashboard');
     }
 
-    public function createHold($id) {
-        $newHold = new Hold();
-        $newHold->waiting = true;
-        $newHold->book_id = $id;
-        $newHold->user_id = Auth::id();
-        $newHold->save();
+    public function createHold($id)
+    {
+        $loans = Loan::where('user_id', Auth::id())->where('status', 'borrowed')->get();
 
-        return redirect('/books/' . $id);
+        if (count($loans) >= 10) {
+            return redirect('/books/' . $id);
+        } else {
+            $newHold = new Hold();
+            $newHold->waiting = true;
+            $newHold->book_id = $id;
+            $newHold->user_id = Auth::id();
+            $newHold->save();
+
+            return redirect('/books/' . $id);
+        }
     }
 
-    public function activateHold($book, $loan) {
+    public function activateHold($book, $loan)
+    {
         //availalility goes from 0 to 1
-        if($book->num_available == 1) {
-            
+        if ($book->num_available == 1) {
+
             //get the most recent hold for this book that is currently waiting
             $hold = Hold::latest('created_at')->where('book_id', $loan->book_id)->where('waiting', true)->first();
 
             //if there is a hold, create a loan for this book and the user
-            if(!empty($hold)) {
+            if (!empty($hold)) {
                 $newLoan = new Loan();
                 $newLoan->book_id = $loan->book_id;
                 $newLoan->user_id = $hold->user_id;
@@ -117,80 +129,64 @@ class LoanController extends Controller
                 $newLoan->return_date = null;
                 $newLoan->status = "borrowed";
                 $newLoan->save();
-                
+
                 $book->num_available -= 1;
                 $book->save();
-                
+
                 $hold->waiting = false;
                 $hold->save();
             }
         }
     }
 
-    public function viewAll(Request $request) {
-        //admin: view and search all loans
-        // if(Auth::user()->admin == true) {
-            $search = $request->input('search');
-            $loans = [];
+    public function viewAll(Request $request)
+    {
+        $search = $request->input('search');
+        $loans = [];
 
-            if($search) {
-                $loans = Loan::whereHas('book', function($query) use($search) {
-                    $query->where('title', 'like', "%$search%");
-                })->with('book')->with('user')->get();
-            } else {
-                $loans = Loan::all();
+        if ($search) {
+            $loans = Loan::whereHas('book', function ($query) use ($search) {
+                $query->where('title', 'like', "%$search%");
+            })->with('book')->with('user')->paginate(10);
+        } else {
+            $loans = Loan::paginate(10);
+        }
+
+        foreach ($loans as $loan) {
+            $loan->user = $loan->user->name; //only get name to pass over
+
+            if ($loan->status == "borrowed") {
+                $today = strtotime(date("m/d/Y"));
+                $due = strtotime($loan->due_date);
+                $difference = $due - $today;
+                $difference = round($difference / (60 * 60 * 24));
+                $loan->date_difference = $difference;
             }
+        }
 
-            foreach($loans as $loan) {
-                $loan->user = $loan->user->name; //only get name to pass over
-
-                if($loan->status == "borrowed") {
-                    $today = strtotime(date("m/d/Y"));
-                    $due = strtotime($loan->due_date);
-                    $difference = $due - $today;
-                    $difference = round($difference / (60 * 60 * 24));
-                    $loan->date_difference = $difference;
-                }
-            }
-            
-            return view('admin-loans', ['loans' => $loans, 'search' => $search]);
-        // } else {
-        //     return view('error', ['message' => "This page is for admins only."]);
-        // }
+        return view('loans/admin-loans', ['loans' => $loans, 'search' => $search]);
     }
 
-    public function editLoan($id) {
+    public function editLoan($id) //admin
+    {
+        return view('loans/edit-loan', ['loan' => Loan::find($id)]);
+    }
+
+    public function updateLoan(Request $request, $id) //admin
+    {
         $loan = Loan::find($id);
-        if(Auth::user()->admin != true) {
-            return view('error', ['message' => "Access denied: This page is for admins only."]);
-        } else {
-            return view('edit-loan', ['loan' => $loan]);
-        }
-    }
-    
-    public function updateLoan(Request $request, $id) {
-        //admin: can only edit due date, return date, and status
-        if(Auth::user()->admin != true) {
-            return view('error', ['message' => "Access denied: This page is for admins only."]);
-        } else {
-            $loan = Loan::find($id);
-            $loan->due_date = $request->due_date;
-            $loan->return_date = $request->return_date;
-            $loan->status = $request->status;
-            $loan->save();
-            return redirect('/viewAll');
-        }
+        $loan->due_date = $request->due_date;
+        $loan->return_date = $request->return_date;
+        $loan->status = $request->status;
+        $loan->save();
+        return redirect('/viewAll');
     }
 
-    public function deleteLoan($id) {
-        //admin
-        if(Auth::user()->admin != true) {
-            return view('error', ['message' => "Access denied: This page is for admins only."]);
-        } else {
-            $loan = Loan::find($id);
-            $loan->delete();
-            return redirect('/viewAll');
-        }
-        
+    public function deleteLoan($id) //admin
+    {
+        $loan = Loan::find($id);
+        $loan->delete();
+        return redirect('/viewAll');
+
     }
 }

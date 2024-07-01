@@ -5,27 +5,33 @@
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
-                    </a>
+                    @if (Auth::user()->admin == true)
+                        <a href="{{ route('viewAll') }}">
+                            <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
+                        </a>
+                    @else
+                        <a href="{{ route('loans') }}">
+                            <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
+                        </a>
+                    @endif
+
+
                 </div>
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Loans') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('pastLoans')" :active="request()->routeIs('pastLoans')">
-                        {{ __('Past Loans') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('books')" :active="request()->routeIs('books')">
-                        {{ __('Books') }}
-                    </x-nav-link>
                     @if (Auth::user()->admin == true)
                         <x-nav-link :href="route('viewAll')" :active="request()->routeIs('viewAll')">
                             {{ __('All Loans') }}
                         </x-nav-link>
                     @endif
+                    <x-nav-link :href="route('loans')" :active="request()->routeIs('loans')">
+                        {{ __('Your Loans') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('books')" :active="request()->routeIs('books')">
+                        {{ __('Books') }}
+                    </x-nav-link>
+
                 </div>
             </div>
 
@@ -86,17 +92,17 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{ 'block': open, 'hidden': !open }" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Loans') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('pastLoans')" :active="request()->routeIs('pastLoans')">
-                {{ __('Past Loans') }}
-            </x-responsive-nav-link>
             @if (Auth::user()->admin == true)
                 <x-responsive-nav-link :href="route('viewAll')" :active="request()->routeIs('viewAll')">
                     {{ __('All Loans') }}
                 </x-responsive-nav-link>
             @endif
+            <x-responsive-nav-link :href="route('loans')" :active="request()->routeIs('loans')">
+                {{ __('Loans') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('books')" :active="request()->routeIs('books')">
+                {{ __('Books') }}
+            </x-responsive-nav-link>
         </div>
 
         <!-- Responsive Settings Options -->

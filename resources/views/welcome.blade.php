@@ -11,7 +11,7 @@
             @auth
                 <div class="mt-3">
                     <p class="text-lg mb-1">Welcome, {{ Auth::user()->name }}!</p>
-                    <form method="GET" action="{{ route('dashboard') }}">
+                    <form method="GET" action="{{ route('loans') }}">
                         <x-primary-button>Go To Your Dashboard</x-primary-button>
                     </form>
                 </div>

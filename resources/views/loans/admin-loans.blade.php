@@ -41,7 +41,8 @@
                             </div>
                         </div>
                         <div class="flex items-center justify-center sm:flex-row flex-col">
-                            <form method="get" action="{{ route('editLoan', $loan->id) }}" class="sm:mr-1 mr-0 sm:mb-0 mb-1">
+                            <form method="get" action="{{ route('editLoan', $loan->id) }}"
+                                class="sm:mr-1 mr-0 sm:mb-0 mb-1">
                                 <x-primary-button class="hover:text-yellow-300">
                                     <i class="fa-solid fa-pencil"></i>
                                 </x-primary-button>
@@ -79,7 +80,9 @@
             @empty
                 <p>No loans</p>
                 @endforelse
+                {{ $loans->appends($_GET)->links() }}
             </div>
+
         </div>
     </div>
     </div>

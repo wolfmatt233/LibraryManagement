@@ -13,7 +13,7 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     //user: loans
-    Route::get('/dashboard', [LoanController::class, 'index'])->name('dashboard');
+    Route::get('/loans', [LoanController::class, 'index'])->name('loans');
     Route::get('/pastLoans', [LoanController::class, 'pastLoans'])->name('pastLoans');
     Route::post('/createLoan/{id}', [LoanController::class, 'createLoan'])->name('createLoan');
     Route::post('/removeLoan/{id}', [LoanController::class, 'removeLoan'])->name('removeLoan');
@@ -36,7 +36,11 @@ Route::middleware(CheckAdmin::class)->group(function() {
 
     //admin: books
     Route::get('/addBook', [BookController::class, 'addBook'])->name('addBook');
+    Route::get('/editBook/{id}', [BookController::class, 'editBook'])->name('editBook');
+    Route::put('/updateBook/{id}', [BookController::class, 'updateBook'])->name('updateBook');
+    Route::get('/addBook', [BookController::class, 'addBook'])->name('addBook');
     Route::post('/createBook', [BookController::class, 'createBook'])->name('createBook');
+    Route::delete('/deleteBook/{id}', [BookController::class, 'deleteBook'])->name('deleteBook');
 });
 
 Route::middleware('auth')->group(function () {

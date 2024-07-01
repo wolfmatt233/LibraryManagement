@@ -13,9 +13,15 @@
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     @if (Route::has('login'))
                         @auth
-                            <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                                {{ __('Your Dashboard') }}
-                            </x-nav-link>
+                            @if (Auth::user()->admin == true)
+                                <x-nav-link :href="route('viewAll')" :active="request()->routeIs('viewAll')">
+                                    {{ __('Your Dashboard') }}
+                                </x-nav-link>
+                            @else
+                                <x-nav-link :href="route('loans')" :active="request()->routeIs('loans')">
+                                    {{ __('Your Dashboard') }}
+                                </x-nav-link>
+                            @endif
                         @else
                             <x-nav-link :href="route('login')" :active="request()->routeIs('login')">
                                 {{ __('Log In') }}
@@ -58,7 +64,7 @@
             <div class="mt-3 space-y-1">
                 @if (Route::has('login'))
                     @auth
-                        <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                        <x-responsive-nav-link :href="route('loans')" :active="request()->routeIs('loans')">
                             {{ __('Dashboard') }}
                         </x-responsive-nav-link>
                     @else

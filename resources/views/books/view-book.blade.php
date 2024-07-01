@@ -54,6 +54,15 @@
                                         @endif
                                     @endif
                                 @endif
+
+                                @if (Auth::user()->admin == true)
+                                    <form method="get" action="{{ route('editBook', $book->id) }}">
+                                        <x-primary-button class="hover:text-yellow-300 mt-2">
+                                            Edit Book
+                                            <i class="fa-solid fa-pencil ml-1"></i>
+                                        </x-primary-button>
+                                    </form>
+                                @endif
                             </div>
                         </div>
                     </div>
