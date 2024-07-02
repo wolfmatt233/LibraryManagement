@@ -10,10 +10,7 @@ This is a system that allows users to borrow books and return them before a cert
 
 -   Add books to wishlist
 -   Filter and sort books
--   Admin features
-    -   Adding books
-    -   Updating books (including image upload)
-    -   Deleting books
+-   Delete book image when book is deleted
 
 MySQL Database:
 
