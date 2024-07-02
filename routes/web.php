@@ -27,7 +27,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/createHold/{id}', [LoanController::class, 'createHold'])->name('createHold');
 });
 
-Route::middleware(CheckAdmin::class)->group(function() {
+Route::middleware(CheckAdmin::class)->group(function () {
     //admin: loans
     Route::get('/viewAll', [LoanController::class, 'viewAll'])->name('viewAll');
     Route::get('/editLoan/{id}', [LoanController::class, 'editLoan'])->name('editLoan');
@@ -35,7 +35,6 @@ Route::middleware(CheckAdmin::class)->group(function() {
     Route::delete('/deleteLoan/{id}', [LoanController::class, 'deleteLoan'])->name('deleteLoan');
 
     //admin: books
-    Route::get('/addBook', [BookController::class, 'addBook'])->name('addBook');
     Route::get('/editBook/{id}', [BookController::class, 'editBook'])->name('editBook');
     Route::put('/updateBook/{id}', [BookController::class, 'updateBook'])->name('updateBook');
     Route::get('/addBook', [BookController::class, 'addBook'])->name('addBook');

@@ -22,7 +22,7 @@
                         @endif
                         <div class="flex">
                             <a href="{{ route('getBook', $loan->book_id) }}">
-                                <img src="{{ URL('/images/' . $loan->book->image) }}" class="mr-2 w-14" />
+                                <img src="{{ asset('storage/images/' . $loan->book->image) }}" class="mr-2 w-14" />
                             </a>
                             <div>
                                 <a class="mr-2 underline" href="{{ route('getBook', $loan->book_id) }}">

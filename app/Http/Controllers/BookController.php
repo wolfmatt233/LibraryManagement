@@ -7,6 +7,7 @@ use App\Models\Loan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class BookController extends Controller
 {
@@ -46,23 +47,32 @@ class BookController extends Controller
 
     public function editBook($id) //page router
     {
-        return view('books/edit-book', ['book' => Loan::find($id)]);
+        return view('books/edit-book', ['book' => Book::find($id)]);
     }
 
     public function updateBook(Request $request)
     {
-        $book = Book::find($request->book_id);
-        $book->title = $request->title; //name='title' etc.
+        $book = Book::find($request->id);
+        $fileName = $book->image;
+
+        if ($request->image) {
+            $file = $request->image;
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $file->storeAs('images', $fileName, 'public');
+        }
+
+        $book->title = $request->title;
         $book->description = $request->description;
         $book->author = $request->author;
         $book->genre = $request->genre;
         $book->isbn = $request->isbn;
         $book->publisher = $request->publisher;
         $book->published = $request->published;
-        //upload new image and delete previous? how to differentiate? force unique name?
-        $book->image = $request->image;
+        $book->image = $fileName;
         $book->num_available = $request->num_available; //deal with current loans if changing number
         $book->save();
+
+        return redirect('/books/' . $request->id);
     }
 
     public function addBook() //page router
@@ -72,8 +82,12 @@ class BookController extends Controller
 
     public function createBook(Request $request)
     {
+        //store cover image
+        $file = $request->image;
+        $fileName = time() . '_' . $file->getClientOriginalName();
+        $file->storeAs('images', $fileName, 'public');
+
         $newBook = new Book();
-        $newBook->user_id = Auth::id();
         $newBook->title = $request->title;
         $newBook->description = $request->description;
         $newBook->author = $request->author;
@@ -81,9 +95,11 @@ class BookController extends Controller
         $newBook->isbn = $request->isbn;
         $newBook->publisher = $request->publisher;
         $newBook->published = $request->published;
-        $newBook->image = $request->image;
+        $newBook->image = $fileName;
         $newBook->num_available = $request->num_available;
         $newBook->save();
+
+        return redirect('/books');
     }
 
     public function deleteBook($id)
