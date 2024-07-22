@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
+use App\Models\Hold;
 use App\Models\Loan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -29,7 +30,9 @@ class BookController extends Controller
     {
         $book = Book::find($id);
         $loans = Loan::where('user_id', Auth::id())->where('status', 'borrowed')->get();
+        $holds = Hold::where('user_id', Auth::id())->where('waiting', true)->get();
         $borrowed = 'false';
+        $holdWaiting = 'false';
         $limited = 'false';
 
         if (count($loans) >= 10) {
@@ -42,7 +45,13 @@ class BookController extends Controller
             }
         }
 
-        return view('books/view-book', ['book' => $book, 'borrowed' => $borrowed, 'limited' => $limited]);
+        foreach ($holds as $hold) {
+            if ($hold->book_id == $id) {
+                $holdWaiting = $hold->id;
+            }
+        }
+
+        return view('books/view-book', ['book' => $book, 'borrowed' => $borrowed, 'limited' => $limited, 'holdWaiting' => $holdWaiting]);
     }
 
     public function editBook($id) //page router
@@ -104,8 +113,8 @@ class BookController extends Controller
 
     public function deleteBook($id)
     {
-        //when is deleted, deal with the current loans using that book
         $book = Book::find($id);
+        Storage::disk('public')->delete('images/' . $book->image);
         $book->delete();
         return redirect('/books');
     }

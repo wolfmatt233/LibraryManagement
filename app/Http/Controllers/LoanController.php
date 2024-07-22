@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\ActivateHold;
 use App\Models\Book;
 use App\Models\Hold;
 use App\Models\Loan;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -89,54 +91,12 @@ class LoanController extends Controller
         $book->save();
         $loan->save();
 
-        $this->activateHold($book, $loan);
-
-        return redirect('/dashboard');
-    }
-
-    public function createHold($id)
-    {
-        $loans = Loan::where('user_id', Auth::id())->where('status', 'borrowed')->get();
-
-        if (count($loans) >= 10) {
-            return redirect('/books/' . $id);
-        } else {
-            $newHold = new Hold();
-            $newHold->waiting = true;
-            $newHold->book_id = $id;
-            $newHold->user_id = Auth::id();
-            $newHold->save();
-
-            return redirect('/books/' . $id);
-        }
-    }
-
-    public function activateHold($book, $loan)
-    {
         //availalility goes from 0 to 1
         if ($book->num_available == 1) {
-
-            //get the most recent hold for this book that is currently waiting
-            $hold = Hold::latest('created_at')->where('book_id', $loan->book_id)->where('waiting', true)->first();
-
-            //if there is a hold, create a loan for this book and the user
-            if (!empty($hold)) {
-                $newLoan = new Loan();
-                $newLoan->book_id = $loan->book_id;
-                $newLoan->user_id = $hold->user_id;
-                $newLoan->borrow_date = date("Y-m-d");
-                $newLoan->due_date = date('Y-m-d', strtotime(date('Y-m-d') . ' + 21 days'));
-                $newLoan->return_date = null;
-                $newLoan->status = "borrowed";
-                $newLoan->save();
-
-                $book->num_available -= 1;
-                $book->save();
-
-                $hold->waiting = false;
-                $hold->save();
-            }
+            ActivateHold::dispatchSync($loan->book_id);
         }
+
+        return redirect('/books/' . $loan->book_id);
     }
 
     public function viewAll(Request $request)

@@ -24,7 +24,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/addWishlist/{id}', [BookController::class, 'addWishlist'])->name('addWishlist');
 
     //user: holds
-    Route::post('/createHold/{id}', [LoanController::class, 'createHold'])->name('createHold');
+    Route::post('/createHold/{id}', [HoldController::class, 'createHold'])->name('createHold');
+    Route::post('/cancelHold/{id}', [HoldController::class, 'cancelHold'])->name('cancelHold');
 });
 
 Route::middleware(CheckAdmin::class)->group(function () {

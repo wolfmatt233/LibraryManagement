@@ -31,11 +31,23 @@
                                                 <x-primary-button class="w-full">Borrow</x-primary-button>
                                             </form>
                                         @elseif($book->num_available == 0)
-                                            <form method="POST" action="{{ route('createHold', $book->id) }}">
-                                                @csrf
-                                                <p class="mb-2 w-full">No copies available. Try reserving the item.</p>
-                                                <x-primary-button class="w-full">Place Hold</x-primary-button>
-                                            </form>
+                                            @if ($holdWaiting == 'false')
+                                                <form method="POST" action="{{ route('createHold', $book->id) }}">
+                                                    @csrf
+                                                    <p class="mb-2 w-full">No copies available. Try reserving the item.
+                                                    </p>
+                                                    <x-primary-button class="w-full">Place Hold</x-primary-button>
+                                                </form>
+                                            @else
+                                                <p
+                                                    class="w-full border border-gray-300 rounded-md font-semibold text-sm text-gray-700 inline-flex p-1 shadow-sm">
+                                                    Your hold is waiting.
+                                                </p>
+                                                <form method="POST" action="{{ route('cancelHold', $book->id) }}">
+                                                    @csrf
+                                                    <x-primary-button class="w-full mt-2">Cancel Hold</x-primary-button>
+                                                </form>
+                                            @endif
                                         @endif
                                     @endif
                                 @endif
@@ -65,7 +77,6 @@
                                 <p><b>Genre:</b> {{ $book->genre }}</p>
                                 <p><b>Copies available:</b> {{ $book->num_available }}</p>
                             </div>
-
                         </div>
                     </div>
                 </div>
