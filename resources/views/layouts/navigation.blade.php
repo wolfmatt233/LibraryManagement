@@ -14,15 +14,16 @@
                             <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
                         </a>
                     @endif
-
-
                 </div>
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     @if (Auth::user()->admin == true)
                         <x-nav-link :href="route('viewAll')" :active="request()->routeIs('viewAll')">
-                            {{ __('All Loans') }}
+                            {{ __('All Loans (Admin)') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('addBook')" :active="request()->routeIs('addBook')">
+                            {{ __('Add Book (Admin)') }}
                         </x-nav-link>
                     @endif
                     <x-nav-link :href="route('loans')" :active="request()->routeIs('loans')">
@@ -31,7 +32,9 @@
                     <x-nav-link :href="route('books')" :active="request()->routeIs('books')">
                         {{ __('Books') }}
                     </x-nav-link>
-
+                    <x-nav-link :href="route('wishlist')" :active="request()->routeIs('wishlist')">
+                        {{ __('Wishlist') }}
+                    </x-nav-link>
                 </div>
             </div>
 
@@ -94,7 +97,10 @@
         <div class="pt-2 pb-3 space-y-1">
             @if (Auth::user()->admin == true)
                 <x-responsive-nav-link :href="route('viewAll')" :active="request()->routeIs('viewAll')">
-                    {{ __('All Loans') }}
+                    {{ __('All Loans (Admin)') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('addBook')" :active="request()->routeIs('addBook')">
+                    {{ __('Add Book (Admin)') }}
                 </x-responsive-nav-link>
             @endif
             <x-responsive-nav-link :href="route('loans')" :active="request()->routeIs('loans')">
@@ -102,6 +108,9 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('books')" :active="request()->routeIs('books')">
                 {{ __('Books') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('wishlist')" :active="request()->routeIs('wishlist')">
+                {{ __('Wishlist') }}
             </x-responsive-nav-link>
         </div>
 

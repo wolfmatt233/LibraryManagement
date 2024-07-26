@@ -12,6 +12,8 @@ window.onload = () => {
     url.forEach((split) => {
         if (split == "editBook") {
             editListeners();
+        } else if (split == "loans") {
+            messageListener();
         }
     });
 };
@@ -32,5 +34,11 @@ function editListeners() {
 
         $("#imageCancelBtn").attr("id", "imageChangeBtn").html("Change Image?");
         editListeners();
+    });
+}
+
+function messageListener() {
+    $("#errorMsg").on("click", () => {
+        $("#errorMsg").css("display", "none");
     });
 }

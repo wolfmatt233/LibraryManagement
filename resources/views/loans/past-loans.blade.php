@@ -30,7 +30,6 @@
                                 </a>
                                 <p>Borrowed: {{ $loan->borrow_date }}</p>
                                 <p>Due Date: {{ $loan->due_date }}</p>
-                                <p></p>
                             </div>
                         </div>
                         <p>Returned {{ $loan->return_date }}</p>

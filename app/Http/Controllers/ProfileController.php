@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\Loan;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
@@ -42,19 +44,25 @@ class ProfileController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current_password'],
-        ]);
+        $loans = Loan::where('user_id', Auth::id())->where('status', 'borrowed')->get();
 
-        $user = $request->user();
+        if (count($loans) > 0) {
+            return Redirect::to('/loans')->withErrors(['You must return your books before deleting your account.']);
+        } else {
+            $request->validateWithBag('userDeletion', [
+                'password' => ['required', 'current_password'],
+            ]);
 
-        Auth::logout();
+            $user = $request->user();
 
-        $user->delete();
+            Auth::logout();
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+            $user->delete();
 
-        return Redirect::to('/');
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return Redirect::to('/');
+        }
     }
 }

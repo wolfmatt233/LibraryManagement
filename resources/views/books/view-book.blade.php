@@ -13,6 +13,7 @@
                         <div class="sm:w-1/5 w-48 sm:mb-0 mb-5">
                             <img src="{{ asset('storage/images/' . $book->image) }}" />
                             <div class="mt-3  w-full">
+                                {{-- Loans & Holds --}}
                                 @if ($borrowed != 'false')
                                     <form method="POST" action="{{ route('removeLoan', $borrowed) }}">
                                         @csrf
@@ -52,6 +53,20 @@
                                     @endif
                                 @endif
 
+                                {{-- Wishlist --}}
+                                @if ($wishlist == 'false')
+                                    <form method="POST" action="{{ route('addWishlist', $book->id) }}">
+                                        @csrf
+                                        <x-primary-button class="w-full mt-2">Add to Wishlist</x-primary-button>
+                                    </form>
+                                @else
+                                    <form method="POST" action="{{ route('removeWishlist', $book->id) }}">
+                                        @csrf
+                                        <x-primary-button class="w-full mt-2">Remove from Wishlist</x-primary-button>
+                                    </form>
+                                @endif
+
+                                {{-- Admin --}}
                                 @if (Auth::user()->admin == true)
                                     <form method="get" action="{{ route('editBook', $book->id) }}">
                                         <x-primary-button class="hover:text-yellow-300 mt-2 w-full">

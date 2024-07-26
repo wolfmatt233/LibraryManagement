@@ -14,14 +14,17 @@ Route::get('/', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     //user: loans
     Route::get('/loans', [LoanController::class, 'index'])->name('loans');
-    Route::get('/pastLoans', [LoanController::class, 'pastLoans'])->name('pastLoans');
     Route::post('/createLoan/{id}', [LoanController::class, 'createLoan'])->name('createLoan');
     Route::post('/removeLoan/{id}', [LoanController::class, 'removeLoan'])->name('removeLoan');
 
     //user: books
     Route::get('/books', [BookController::class, 'index'])->name('books');
     Route::get('/books/{id}', [BookController::class, 'getBook'])->name('getBook');
+
+    //user: wishlist
+    Route::get('/wishlist', [BookController::class, 'wishlist'])->name('wishlist');
     Route::post('/addWishlist/{id}', [BookController::class, 'addWishlist'])->name('addWishlist');
+    Route::post('/removeWishlist/{id}', [BookController::class, 'removeWishlist'])->name('removeWishlist');
 
     //user: holds
     Route::post('/createHold/{id}', [HoldController::class, 'createHold'])->name('createHold');

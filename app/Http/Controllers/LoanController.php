@@ -4,9 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Jobs\ActivateHold;
 use App\Models\Book;
-use App\Models\Hold;
 use App\Models\Loan;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -17,14 +15,20 @@ class LoanController extends Controller
     {
         $uid = Auth::id();
         $search = $request->input('search');
+        $past = $request->input('pastLoans');
+        $sort = $request->input('sort');
         $loans = [];
 
-        if ($search) {
-            $loans = Loan::where('user_id', $uid)->where('status', 'borrowed')->whereHas('book', function ($query) use ($search) {
+        $past == "on" ? $past = "returned" : $past = "borrowed";
+
+        if ($sort) {
+            $loans = Loan::where('user_id', $uid)->where('status', $past)->whereHas('book', function ($query) use ($search) {
                 $query->where('title', 'like', "%$search%");
-            })->with('book')->get();
+            })->join('books', 'loans.book_id', '=', 'books.id')->orderBy('title', $sort)->with('book')->paginate(15);
         } else {
-            $loans = Loan::where('user_id', $uid)->where('status', 'borrowed')->with('book')->get();
+            $loans = Loan::where('user_id', $uid)->where('status', $past)->whereHas('book', function ($query) use ($search) {
+                $query->where('title', 'like', "%$search%");
+            })->with('book')->paginate(15);
         }
 
         foreach ($loans as $loan) {
@@ -35,24 +39,9 @@ class LoanController extends Controller
             $loan->date_difference = $difference;
         }
 
-        return view('loans/loans', ['loans' => $loans, 'search' => $search]);
-    }
+        $past == "returned" ? $past = "on" : $past = "";
 
-    public function pastLoans(Request $request)
-    {
-        $id = Auth::id();
-        $search = $request->input('search');
-        $loans = [];
-
-        if ($search) {
-            $loans = Loan::where('user_id', $id)->where('status', 'returned')->whereHas('book', function ($query) use ($search) {
-                $query->where('title', 'like', "%$search%");
-            })->with('book')->get();
-        } else {
-            $loans = Loan::where('user_id', $id)->where('status', 'returned')->with('book')->get();
-        }
-
-        return view('loans/past-loans', ['loans' => $loans], ['search' => $search]);
+        return view('loans/loans', ['loans' => $loans, 'search' => $search, 'past' => $past, 'sort' => $sort]);
     }
 
     public function createLoan($id)
@@ -99,6 +88,7 @@ class LoanController extends Controller
         return redirect('/books/' . $loan->book_id);
     }
 
+    //Admin
     public function viewAll(Request $request)
     {
         $search = $request->input('search');
@@ -127,11 +117,13 @@ class LoanController extends Controller
         return view('loans/admin-loans', ['loans' => $loans, 'search' => $search]);
     }
 
+    //Admin
     public function editLoan($id) //admin
     {
         return view('loans/edit-loan', ['loan' => Loan::find($id)]);
     }
 
+    //Admin
     public function updateLoan(Request $request, $id) //admin
     {
         $loan = Loan::find($id);
@@ -142,6 +134,7 @@ class LoanController extends Controller
         return redirect('/viewAll');
     }
 
+    //Admin
     public function deleteLoan($id) //admin
     {
         $loan = Loan::find($id);
