@@ -40,7 +40,7 @@
 
                     <hr class="my-3">
 
-                    <div class="grid grid-cols-[repeat(auto-fill,10rem)] justify-center gap-20">
+                    <div class="grid grid-cols-[repeat(auto-fill,10rem)] justify-center gap-20 mb-4">
                         @forelse ($books as $key=>$book)
                             <a class="mr-5 border" href="{{ route('getBook', $book->book->id) }}">
                                 <img src="{{ asset('storage/images/' . $book->book->image) }}" />

@@ -38,9 +38,9 @@
                         @endif
                     </form>
 
-                    <hr class="my-3">
+                    <hr class="my-3 mb-4">
 
-                    <div class="grid grid-cols-[repeat(auto-fill,10rem)] justify-center gap-20">
+                    <div class="grid grid-cols-[repeat(auto-fill,10rem)] justify-center gap-20 mb-4">
                         @forelse ($books as $key=>$book)
                             <a class="mr-5 border" href="{{ route('getBook', $book->id) }}">
                                 <img src="{{ asset('storage/images/' . $book->image) }}" />

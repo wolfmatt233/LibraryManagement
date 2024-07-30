@@ -7,7 +7,7 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-4">
                 <div class="p-6 text-gray-900">
                     @if ($errors->any())
                         <div class="cursor-pointer mb-3 flex" id='errorMsg'>
@@ -101,7 +101,7 @@
                         @endif
                 </div>
             @empty
-                <p class="ml-2">No loans found.</p>
+                <p class="ml-2 mb-4">No loans found.</p>
                 @endforelse
             </div>
             {{ $loans->appends($_GET)->links() }}
