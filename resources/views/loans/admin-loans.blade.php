@@ -9,11 +9,52 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <form method="GET" action="{{ route('viewAll') }}" class="flex w-full mb-5 sm:flex-row flex-col">
-                        <x-text-input name="search" placeholder="Search loans here..." value="{{ $search }}"
-                            class="w-full mr-3 sm:mb-0 mb-2" />
-                        <x-primary-button class="sm:justify-normal justify-center">Search</x-primary-button>
+                    <form method="GET" action="{{ route('viewAll') }}">
+                        <div class="flex w-full mb-3 sm:flex-row flex-col">
+                            <x-text-input name="search" placeholder="Search loans by book title or user name..."
+                                value="{{ $search }}" class="w-full mr-3 sm:mb-0 mb-2" />
+                            <x-primary-button class="sm:justify-normal justify-center">Search</x-primary-button>
+                        </div>
+
+                        <x-primary-button class="mr-3">Filter</x-primary-button>
+
+                        {{-- Sorting --}}
+                        @if (!$sort)
+                            <select name="sort" id="sort" class="mr-3">
+                                <option disabled selected>Sort Alphabetically (by book)</option>
+                                <option value="asc">Sort Ascending &uarr;</option>
+                                <option value="desc">Sort Descending &darr;</option>
+                            </select>
+                        @elseif($sort == 'asc')
+                            <select name="sort" id="sort" class="mr-3">
+                                <option disabled>Sort Alphabetically (by book)</option>
+                                <option value="asc" selected>Sort Ascending &uarr;</option>
+                                <option value="desc">Sort Descending &darr;</option>
+                            </select>
+                        @elseif ($sort == 'desc')
+                            <select name="sort" id="sort" class="mr-3">
+                                <option disabled>Sort Alphabetically (by book)</option>
+                                <option value="asc">Sort Ascending &uarr;</option>
+                                <option value="desc" selected>Sort Descending &darr;</option>
+                            </select>
+                        @endif
+
+                        {{-- Loan Status --}}
+                        @if (!$status || $status == 'returned')
+                            <select name="status" id="status" class="mr-3">
+                                <option selected value="returned">Sort by Returned</option>
+                                <option value="borrowed">Sort by Borrowed</option>
+                            </select>
+                        @else
+                            <select name="status" id="status" class="mr-3">
+                                <option value="returned">Sort by Returned</option>
+                                <option selected value="borrowed">Sort by Borrowed</option>
+                            </select>
+                        @endif
                     </form>
+
+                    <hr class="my-3">
+
                     @forelse ($loans as $key=>$loan)
                         @if ($key % 2 != 0)
                             <div class="p-3 flex justify-between items-center">

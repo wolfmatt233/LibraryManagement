@@ -24,11 +24,11 @@ class LoanController extends Controller
         if ($sort) {
             $loans = Loan::where('user_id', $uid)->where('status', $past)->whereHas('book', function ($query) use ($search) {
                 $query->where('title', 'like', "%$search%");
-            })->join('books', 'loans.book_id', '=', 'books.id')->orderBy('title', $sort)->with('book')->paginate(15);
+            })->join('books', 'loans.book_id', '=', 'books.id')->orderBy('title', $sort)->with('book')->paginate(10);
         } else {
             $loans = Loan::where('user_id', $uid)->where('status', $past)->whereHas('book', function ($query) use ($search) {
                 $query->where('title', 'like', "%$search%");
-            })->with('book')->paginate(15);
+            })->with('book')->paginate(10);
         }
 
         foreach ($loans as $loan) {
@@ -92,14 +92,30 @@ class LoanController extends Controller
     public function viewAll(Request $request)
     {
         $search = $request->input('search');
+        $status = $request->input('status');
+        $sort = $request->input('sort');
         $loans = [];
 
-        if ($search) {
-            $loans = Loan::whereHas('book', function ($query) use ($search) {
+        empty($status) ? $status = 'returned' : $status;
+
+        if ($sort) {
+            // Loan where search like book title OR search like user name
+            $loans = Loan::whereHas('book', function ($query) use ($search, $status) {
                 $query->where('title', 'like', "%$search%");
-            })->with('book')->with('user')->paginate(10);
+                $query->where('status', $status);
+            })->orWhereHas('user', function ($query) use ($search, $status) {
+                $query->where('name', 'like', "%$search%");
+                $query->where('status', $status);
+            })->join('books', 'loans.book_id', '=', 'books.id')->orderBy('title', $sort)->with('book')->with('user')->paginate(10);
         } else {
-            $loans = Loan::paginate(10);
+            $loans = Loan::whereHas('book', function ($query) use ($search, $status) {
+                $query->where('title', 'like', "%$search%");
+                $query->where('status', $status);
+            })->orWhereHas('user', function ($query) use ($search, $status) {
+                $query->where('name', 'like', "%$search%");
+                $query->where('status', $status);
+            })->with('book')->with('user')->paginate(10);
+
         }
 
         foreach ($loans as $loan) {
@@ -114,7 +130,7 @@ class LoanController extends Controller
             }
         }
 
-        return view('loans/admin-loans', ['loans' => $loans, 'search' => $search]);
+        return view('loans/admin-loans', ['loans' => $loans, 'search' => $search, 'status' => $status, 'sort' => $sort]);
     }
 
     //Admin

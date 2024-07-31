@@ -155,8 +155,7 @@ class BookController extends Controller
 
     public function removeWishlist($id)
     {
-        $newWishlist = Wishlist::where('user_id', Auth::id())->where('book_id', $id)->get();
-        $newWishlist->delete();
+        Wishlist::where('user_id', Auth::id())->where('book_id', $id)->delete();
 
         return redirect('/books/' . $id);
     }
