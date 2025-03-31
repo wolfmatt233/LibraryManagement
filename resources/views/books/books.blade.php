@@ -43,7 +43,7 @@
                     <div class="grid grid-cols-[repeat(auto-fill,10rem)] justify-center gap-20 mb-4">
                         @forelse ($books as $key=>$book)
                             <a class="mr-5 border" href="{{ route('getBook', $book->id) }}">
-                                <img src="{{ asset('storage/images/' . $book->image) }}" />
+                                <img src="{{ asset("storage/images/$book->image") }}" />
                                 <div class="p-1">
                                     <p class="text-sm">{{ $book->title }}</p>
                                     <p class="text-xs">by {{ $book->author }}</p>
